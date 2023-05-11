@@ -1,0 +1,139 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Btn_Start
+  m_Shader: {fileID: 4800000, guid: 440af2f92f8ebc04ab48870ca592dbcf, type: 3}
+  m_ShaderKeywords: _FLOWLIGHT_ON
+  m_LightmapFlags: 1
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _AO:
+        m_Texture: {fileID: 2800000, guid: cbc856391f45e6a498fd740203a8be67, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BaseColor:
+        m_Texture: {fileID: 2800000, guid: 69d708b1e75651e40b0e0f3d99d96623, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 2800000, guid: 2b36fd9e65d786945952246b7a124e90, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ColorMask:
+        m_Texture: {fileID: 2800000, guid: a437ada4b86b51e4f8b686dfb6d8f985, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 2800000, guid: 3a6bb94ed2a1f5b4c9b7cca72977fe28, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FlowMask:
+        m_Texture: {fileID: 2800000, guid: 03c646a3fdae18240988a936b7693672, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 8c2a8c9609bfade48987ae8d19df0649, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 2800000, guid: fe0a3de6d1c87184e9f943c60000b991, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap1:
+        m_Texture: {fileID: 2800000, guid: f61db73c354505b4a842c196d6d2b585, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 2800000, guid: 1ff3e01a6f351d2438ca69b2590b06c4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecGlossMap:
+        m_Texture: {fileID: 2800000, guid: 20beb9975c798b340a559dd05b84a536, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _BreathLight: 0
+    - _BreathSpeed: 2
+    - _BumpScale: 0.65
+    - _Cutoff: 0.5
+    - _DetailNormalMapScale: 1
+    - _DstBlend: 0
+    - _Flow: 0
+    - _FlowLight: 1
+    - _FlowSpeed: 0.3
+    - _GlossLevel: 0.3
+    - _GlossMapScale: 1
+    - _GlossMapScale1: 0
+    - _Glossiness: 0.5
+    - _GlossyReflections: 1
+    - _Keyword0: 0
+    - _Keyword1: 0
+    - _Level: 0
+    - _Metallic: 0
+    - _Mode: 0
+    - _NormalLevel: 1
+    - _NormalScale: 1
+    - _NormalScale1: 1
+    - _OcclusionStrength: 1
+    - _Parallax: 0.02
+    - _SmoothnessTextureChannel: 0
+    - _SpecLevel: 0.5
+    - _SpecularHighlights: 1
+    - _SrcBlend: 1
+    - _ToggleSwitch0: 0
+    - _UVSec: 0
+    - _VoiceVolume: 1
+    - _ZWrite: 1
+    - __dirty: 0
+    m_Colors:
+    - _BreatheBlue: {r: 5.4289613, g: 4.303167, b: 0, a: 1}
+    - _BreatheColor: {r: 0.039215676, g: 0.2033496, b: 1.4980392, a: 1}
+    - _BreatheLight_A: {r: 1.5, g: 1.5, b: 1.5, a: 0}
+    - _BreatheLight_B: {r: 0.026392521, g: 0.79931587, b: 0.7456407, a: 0}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color0: {r: 0.8773585, g: 0.5930204, b: 0.5752492, a: 1}
+    - _EmissionColor: {r: 1.1335572, g: 1.1335572, b: 1.1335572, a: 1}
+    - _FlowColor: {r: 0.59607846, g: 0.78431374, b: 1.4980392, a: 1}
+    - _FlowLight: {r: 0, g: 0.7854869, b: 2.0274053, a: 1}
+    - _FlowLightColor: {r: 0.039215676, g: 0.78431374, b: 1.4980392, a: 0}
+    - _FlowLightSwitch: {r: 0, g: 0.8949084, b: 1, a: 0}
+    - _FlowType: {r: 0, g: 1, b: 0.16606593, a: 1}
+    - _GraColorA: {r: 1, g: 0.5613208, b: 0.5613208, a: 1}
+    - _MainColor: {r: 1.0665418, g: 1.0665418, b: 1.0665418, a: 1}
+    - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
