@@ -1,7 +1,7 @@
-# MR Jelbee Demo
+# Jelbee MR Demo
 Copyright 2022-2023, HTC Corporation. All rights reserved.
 ## About
-MR Jelbee Demo is an MR experience example for VIVE XR Elite. It demonstrates MR applications such as virtual room setup, gestures, interactions, and grabbing objects into MR. There are four experiences in the Demo:
+Jelbee MR Demo is an MR experience example for VIVE XR Elite. It demonstrates MR applications such as virtual room setup, gestures, interactions, and grabbing objects into MR. There are four experiences in the Demo:
 +	Whack-A-Mole on the desk 
 +	Bubbling with OK gesture 
 +	MR Portal 
