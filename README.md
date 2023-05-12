@@ -43,6 +43,6 @@ MR Jelbee Demo is an MR experience example for VIVE XR Elite. It demonstrates MR
 +	[Customizable Planet Shaders](https://assetstore.unity.com/packages/vfx/shaders/customizable-planet-shaders-131872) (not included in project)
 +	[DOTween](http://dotween.demigiant.com/)
 ## License
-See LICENSE.pdf for more information.
+See [LICENSE.pdf](LICENSE.pdf) for more information.
 ## Contact Us
 Email: ViveSoftware@htc.com
