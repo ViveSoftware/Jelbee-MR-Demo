@@ -30,9 +30,9 @@ public class SetupManager : MonoBehaviour
 
     void Start()
     {
-        SceneComponentManager.Instance.LoadScenePlanes();
-        List<PlaneController> planeControllers = generator.GenerateScenePlanes(SceneComponentManager.Instance.Planes);
-        foreach(PlaneController planeController in planeControllers)
+        SceneComponentManager.Instance.GenerateScenePlanes(generator);
+
+        foreach(PlaneController planeController in SceneComponentManager.Instance.PlaneControllers)
         {
             (planeController as SetupPlaneController).OnClickedHandler += OnScenePlaneClicked;
             if(planeController.ShapeType == ShapeTypeEnum.table)
@@ -169,6 +169,6 @@ public class SetupManager : MonoBehaviour
 
     public void StartGame()
     {
-        SceneManager.LoadScene(0, LoadSceneMode.Single);
+        EventMediator.LeaveSetupMode();
     }
 }

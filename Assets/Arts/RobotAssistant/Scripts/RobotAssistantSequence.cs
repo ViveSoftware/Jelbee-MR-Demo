@@ -92,6 +92,6 @@ public class RobotAssistantSequence : MonoBehaviour
         yield return new WaitForSeconds(4f);
         theEndAnimator.gameObject.SetActive(false);
         Destroy(MRFlowManager.Instance.EndingPortal.gameObject);
-        MRSceneManager.Instance.RestartGame();
+        EventMediator.RestartGame();
     }
 }
