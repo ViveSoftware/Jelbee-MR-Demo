@@ -16,6 +16,11 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using Wave.Essence.Extra;
+using System.Text;
+using UnityEngine.Profiling;
+using UnityEngine.XR;
+using Wave.XR;
+using Wave.OpenXR;
 
 namespace Wave.Essence.Hand.Model
 {
@@ -23,16 +28,16 @@ namespace Wave.Essence.Hand.Model
 	[DisallowMultipleComponent]
 	public class HandMeshRenderer : MonoBehaviour
 	{
-		private const string LOG_TAG = "HandMeshRenderer";
-		private void DEBUG(string msg)
+		private const string TAG = "HandMeshRenderer";
+		private InputDevice handDev = new InputDevice();
+		private bool foundHandDev = false;
+
+		private StringBuilder HSB
 		{
-			if (Log.EnableDebugLog)
-				Log.d(LOG_TAG, (IsLeft ? "Left" : "Right") + ", " + msg, true);
-		}
-		private void PrintGPLDebug(string msg)
-		{
-			if (Log.gpl.Print)
-				Log.d(LOG_TAG, (IsLeft ? "Left" : "Right") + ", " + msg, true);
+			get
+			{
+				return Log.CSB.Append(IsLeft ? "Left, " : "Right, ");
+			}
 		}
 
 		public class BoneMap
@@ -146,6 +151,9 @@ namespace Wave.Essence.Hand.Model
 		[HideInInspector]
 		public bool checkInteractionMode = false;
 
+		[Tooltip("Use input device to update bones directly.  Will be faster but no Wave Essence feature support.")]
+		public bool useInputDevice = true;
+
 		private Vector3[] s_JointPosition = new Vector3[BONE_MAX_ID];
 		private Quaternion[] s_JointRotation = new Quaternion[BONE_MAX_ID];
 
@@ -179,11 +187,11 @@ namespace Wave.Essence.Hand.Model
 
 		public void AutoDetect()
 		{
-			DEBUG("AutoDetect()");
+			Log.d(TAG, HSB.Append("AutoDetect()"));
 			customizedSkinMeshRend = transform.GetComponentInChildren<SkinnedMeshRenderer>();
 			if (customizedSkinMeshRend == null)
 			{
-				DEBUG("AutoDetect() Cannot find SkinnedMeshRenderer in " + name);
+				Log.d(TAG, HSB.Append("AutoDetect() Cannot find SkinnedMeshRenderer in ").Append(name));
 				return;
 			}
 
@@ -194,15 +202,15 @@ namespace Wave.Essence.Hand.Model
 
 				if (t == null)
 				{
-					DEBUG("AutoDetect() " + boneMap[i].DisplayName + " not found!");
+					Log.d(TAG, HSB.Append("AutoDetect() ").Append(boneMap[i].DisplayName).Append(" not found!"));
 					continue;
 				}
 
-				DEBUG("AutoDetect() " + boneMap[i].DisplayName + " found: " + searchName);
+				Log.d(TAG, HSB.Append("AutoDetect() ").Append(boneMap[i].DisplayName).Append(" found: ").Append(searchName));
 				customizedBonePoses[i] = t;
 			}
 			alreadyDetect = true;
-			DEBUG("AutoDetect--");
+			Log.d(TAG, HSB.Append("AutoDetect--"));
 		}
 
 
@@ -215,12 +223,12 @@ namespace Wave.Essence.Hand.Model
 			catch (Exception e)
 			{
 				handModelDesc = null;
-				Log.d(LOG_TAG, e.ToString());
+				Log.d(TAG, e.ToString());
 			}
 
 			if (handModelDesc == null)
 			{
-				Log.d(LOG_TAG, "Apply fixed OEM data.", true);
+				Log.d(TAG, "Apply fixed OEM data.", true);
 				handModelDesc = new JSON_HandModelDesc_Ext();
 				handModelDesc.default_style = new JSON_HandStyleDesc_Ext();
 				handModelDesc.default_style.gra_color_A = new Color(0.1058824f, 0.6901961f, 0.9019608f, 0);
@@ -246,23 +254,23 @@ namespace Wave.Essence.Hand.Model
 				var sb = Log.CSB.Append(i == 0 ? "default_style { " : "fusion_style { ");
 				style.Dump(sb);
 				sb.Append(" } ");
-				Log.d(LOG_TAG, sb.ToString(), true);
+				Log.d(TAG, sb, true);
 			}
 		}
 
 		public bool GetNaturalHandModel()
 		{
-			DEBUG("GetNaturalHandModel");
+			Log.d(TAG, HSB.Append("GetNaturalHandModel"));
 			WVR_Result r = Interop.WVR_GetCurrentNaturalHandModel(ref handModel);
-			DEBUG("WVR_GetCurrentNaturalHandModel, handModel IntPtr = " + handModel.ToInt32());
-			DEBUG("sizeof(WVR_HandRenderModel) = " + Marshal.SizeOf(typeof(WVR_HandRenderModel)));
+			Log.d(TAG, HSB.Append("WVR_GetCurrentNaturalHandModel, handModel IntPtr = ").Append(handModel.ToInt32()));
+			Log.d(TAG, HSB.Append("sizeof(WVR_HandRenderModel) = ").Append(Marshal.SizeOf(typeof(WVR_HandRenderModel))));
 			if (r == WVR_Result.WVR_Success)
 			{
 				if (handModel != IntPtr.Zero)
 				{
-					DEBUG("handModels");
+					Log.d(TAG, HSB.Append("handModels"));
 					WVR_HandRenderModel handModels = (WVR_HandRenderModel)Marshal.PtrToStructure(handModel, typeof(WVR_HandRenderModel));
-					DEBUG("handModels--");
+					Log.d(TAG, HSB.Append("handModels--"));
 					if (IsLeft)
 						createHandMesh(handModels.left, handModels.handAlphaTex);
 					else
@@ -271,14 +279,14 @@ namespace Wave.Essence.Hand.Model
 			}
 			else
 			{
-				DEBUG("GetCurrentNaturalHandModel failed: " + r);
+				Log.d(TAG, HSB.Append("GetCurrentNaturalHandModel failed: ").Append(r));
 				return false;
 			}
 
 			skinMeshRend = m_SystemHand.GetComponentInChildren<SkinnedMeshRenderer>();
 			if (skinMeshRend == null)
 			{
-				DEBUG("Cannot find SkinnedMeshRenderer in " + name);
+				Log.d(TAG, HSB.Append("Cannot find SkinnedMeshRenderer in ").Append(name));
 				return false;
 			}
 			for (int i = 0; i < boneMap.Length; i++)
@@ -288,14 +296,14 @@ namespace Wave.Essence.Hand.Model
 
 				if (t == null)
 				{
-					DEBUG("GetNaturalHandModel() " + boneMap[i].DisplayName + " not found!");
+					Log.d(TAG, HSB.Append("GetNaturalHandModel() ").Append(boneMap[i].DisplayName).Append(" not found!"));
 					continue;
 				}
 
-				DEBUG("GetNaturalHandModel() " + boneMap[i].DisplayName + " found: " + searchName);
+				Log.d(TAG, HSB.Append("GetNaturalHandModel() ").Append(boneMap[i].DisplayName).Append(" found: ").Append(searchName));
 			}
 			Interop.WVR_ReleaseNaturalHandModel(ref handModel);
-			DEBUG("GetNaturalHandModel--");
+			Log.d(TAG, HSB.Append("GetNaturalHandModel--"));
 			return true;
 		}
 
@@ -372,7 +380,7 @@ namespace Wave.Essence.Hand.Model
 
 		private void createHandMesh(WVR_HandModel hand, WVR_CtrlerTexBitmap texBitmap)
 		{
-			DEBUG("createHandMesh");
+			Log.d(TAG, HSB.Append("createHandMesh"));
 
 			ReadJson();
 
@@ -381,14 +389,14 @@ namespace Wave.Essence.Hand.Model
 			m_SystemHandMesh = new GameObject("SystemHandMesh" + (IsLeft ? "Left" : "Right"));
 			m_SystemHandMesh.transform.SetParent(m_SystemHand.transform, false);
 
-			DEBUG("handTran create");
+			Log.d(TAG, HSB.Append("handTran create"));
 			for (int i = 0; i < runtimeBonePoses.Length; i++)
 			{
 				handTran[i] = new GameObject("WaveBone_" + i);
 				handTran[i].SetActive(true);
 				runtimeBonePoses[i] = handTran[i].transform;
 			}
-			DEBUG("handTran create--");
+			Log.d(TAG, HSB.Append("handTran create--"));
 			for (int i = 0; i < runtimeBonePoses.Length; i++)
 			{
 				if (hand.jointParentTable[i] == 47)
@@ -402,12 +410,12 @@ namespace Wave.Essence.Hand.Model
 			}
 
 			if (m_SystemHand != null)
-				DEBUG(m_SystemHand.name + " parent: " + m_SystemHand.transform.parent.name);
+				Log.d(TAG, HSB.Append(m_SystemHand.name).Append(" parent: ").Append(m_SystemHand.transform.parent.name));
 			if (m_SystemHandMesh != null)
-				DEBUG(m_SystemHandMesh.name + " parent: " + m_SystemHandMesh.transform.parent.name);
+				Log.d(TAG, HSB.Append(m_SystemHandMesh.name).Append(" parent: ").Append(m_SystemHandMesh.transform.parent.name));
 			for (int i = 0; i < runtimeBonePoses.Length; i++)
 			{
-				DEBUG(handTran[i].name + " parent: " + handTran[i].transform.parent.name);
+				Log.d(TAG, HSB.Append(handTran[i].name).Append(" parent: ").Append(handTran[i].transform.parent.name));
 			}
 
 			/*create basic mesh*/
@@ -422,7 +430,7 @@ namespace Wave.Essence.Hand.Model
 			{
 				uint verticesCount = (vertices.size / vertices.dimension);
 
-				DEBUG(" vertices size = " + vertices.size + ", dimension = " + vertices.dimension + ", count = " + verticesCount);
+				Log.d(TAG, HSB.Append(" vertices size = ").Append(vertices.size).Append(", dimension = ").Append(vertices.dimension).Append(", count = ").Append(verticesCount));
 
 				_vertices = new Vector3[verticesCount];
 				float[] verticeArray = new float[vertices.size];
@@ -444,7 +452,7 @@ namespace Wave.Essence.Hand.Model
 			}
 			else
 			{
-				DEBUG("vertices buffer's dimension incorrect!");
+				Log.d(TAG, HSB.Append("vertices buffer's dimension incorrect!"));
 			}
 				// normals
 				WVR_VertexBuffer normals = hand.normals;
@@ -452,7 +460,7 @@ namespace Wave.Essence.Hand.Model
 			if (normals.dimension == 3)
 			{
 				uint normalsCount = (normals.size / normals.dimension);
-				DEBUG(" normals size = " + normals.size + ", dimension = " + normals.dimension + ", count = " + normalsCount);
+				Log.d(TAG, HSB.Append(" normals size = ").Append(normals.size).Append(", dimension = ").Append(normals.dimension).Append(", count = ").Append(normalsCount));
 				_normals = new Vector3[normalsCount];
 				float[] normalArray = new float[normals.size];
 
@@ -475,7 +483,7 @@ namespace Wave.Essence.Hand.Model
 			}
 			else
 			{
-				DEBUG("normals buffer's dimension incorrect!");
+				Log.d(TAG, HSB.Append("normals buffer's dimension incorrect!"));
 			}
 
 			// texCoord
@@ -484,7 +492,7 @@ namespace Wave.Essence.Hand.Model
 			if (texCoord.dimension == 2)
 			{
 				uint uvCount = (texCoord.size / texCoord.dimension);
-				DEBUG(" texCoord size = " + texCoord.size + ", dimension = " + texCoord.dimension + ", count = " + uvCount);
+				Log.d(TAG, HSB.Append(" texCoord size = ").Append(texCoord.size).Append(", dimension = ").Append(texCoord.dimension).Append(", count = ").Append(uvCount));
 				_uv = new Vector2[uvCount];
 				float[] texCoordArray = new float[texCoord.size];
 
@@ -505,7 +513,7 @@ namespace Wave.Essence.Hand.Model
 			}
 			else
 			{
-				DEBUG("texCoord buffer's dimension incorrect!");
+				Log.d(TAG, HSB.Append("texCoord buffer's dimension incorrect!"));
 			}
 
 			// texCoord2s
@@ -514,7 +522,7 @@ namespace Wave.Essence.Hand.Model
 			if (texCoord2s.dimension == 2)
 			{
 				uint uvCount = (texCoord2s.size / texCoord2s.dimension);
-				DEBUG(" texCoord2s size = " + texCoord2s.size + ", dimension = " + texCoord2s.dimension + ", count = " + uvCount);
+				Log.d(TAG, HSB.Append(" texCoord2s size = ").Append(texCoord2s.size).Append(", dimension = ").Append(texCoord2s.dimension).Append(", count = ").Append(uvCount));
 				_uv2 = new Vector2[uvCount];
 				float[] texCoord2sArray = new float[texCoord2s.size];
 
@@ -535,12 +543,12 @@ namespace Wave.Essence.Hand.Model
 			}
 			else
 			{
-				DEBUG("texCoord2s buffer's dimension incorrect!");
+				Log.d(TAG, HSB.Append("texCoord2s buffer's dimension incorrect!"));
 			}
 
 			// indices
 			WVR_IndexBuffer indices = hand.indices;
-			DEBUG(" indices size = " + indices.size);
+			Log.d(TAG, HSB.Append(" indices size = ").Append(indices.size));
 			int[] indicesArray = new int[indices.size];
 			Marshal.Copy(indices.buffer, indicesArray, 0, indicesArray.Length);
 
@@ -560,11 +568,11 @@ namespace Wave.Essence.Hand.Model
 			if (hand.boneIDs.dimension == 4 && hand.boneWeights.dimension == 4)
 			{
 				uint boneIDsCount = (hand.boneIDs.size / hand.boneIDs.dimension);
-				DEBUG(" boneIDs size = " + hand.boneIDs.size + ", dimension = " + hand.boneIDs.dimension + ", count = " + boneIDsCount);
+				Log.d(TAG, HSB.Append(" boneIDs size = ").Append(hand.boneIDs.size).Append(", dimension = ").Append(hand.boneIDs.dimension).Append(", count = ").Append(boneIDsCount));
 				int[] boneIDsArray = new int[hand.boneIDs.size];
 				Marshal.Copy(hand.boneIDs.buffer, boneIDsArray, 0, boneIDsArray.Length);
 				uint boneWeightsCount = (hand.boneWeights.size / hand.boneWeights.dimension);
-				DEBUG(" boneWeights size = " + hand.boneWeights.size + ", dimension = " + hand.boneWeights.dimension + ", count = " + boneWeightsCount);
+				Log.d(TAG, HSB.Append(" boneWeights size = ").Append(hand.boneWeights.size).Append(", dimension = ").Append(hand.boneWeights.dimension).Append(", count = ").Append(boneWeightsCount));
 				float[] boneWeightsArray = new float[hand.boneWeights.size];
 				Marshal.Copy(hand.boneWeights.buffer, boneWeightsArray, 0, boneWeightsArray.Length);
 
@@ -603,7 +611,7 @@ namespace Wave.Essence.Hand.Model
 			}
 			else
 			{
-				DEBUG("boneIDs buffer dimension = " + hand.boneIDs.dimension + "or boneWeights buffer dimension = " + hand.boneWeights.dimension + "is incorrect!");
+				Log.d(TAG, HSB.Append("boneIDs buffer dimension = ").Append(hand.boneIDs.dimension).Append("or boneWeights buffer dimension = ").Append(hand.boneWeights.dimension).Append("is incorrect!"));
 			}
 
 			// model texture section
@@ -655,7 +663,7 @@ namespace Wave.Essence.Hand.Model
 				skinMeshRend.rootBone = handTran[1].transform;
 				if (ImgMaterial == null)
 				{
-					DEBUG("ImgMaterial is null");
+					Log.d(TAG, HSB.Append("ImgMaterial is null"));
 				}
 				skinMeshRend.material = ImgMaterial;
 				skinMeshRend.material.mainTexture = modelpng;
@@ -665,9 +673,9 @@ namespace Wave.Essence.Hand.Model
 			}
 			else
 			{
-				DEBUG("SkinnedMeshRenderer is null");
+				Log.d(TAG, HSB.Append("SkinnedMeshRenderer is null"));
 			}
-			DEBUG("createHandMesh--");
+			Log.d(TAG, HSB.Append("createHandMesh--"));
 		}
 
 		public void ClearDetect()
@@ -683,7 +691,7 @@ namespace Wave.Essence.Hand.Model
 		{
 			if (handModelDesc == null || handModelDesc.fusion_style == null || handModelDesc.default_style == null)
 			{
-				Log.w(LOG_TAG, "no OEM config");
+				Log.w(TAG, "no OEM config");
 				return;
 			}
 			var style = isStable ? handModelDesc.fusion_style : handModelDesc.default_style;
@@ -695,7 +703,7 @@ namespace Wave.Essence.Hand.Model
 			skinMeshRend.material.SetFloat("_Opacity", style.filling_opacity);
 			skinMeshRend.material.SetFloat("_line_opacity", style.contouring_opacity);
 			// Only show variables which will be updated.
-			Log.d(LOG_TAG, Log.CSB
+			Log.d(TAG, Log.CSB
 				.Append("SetStyle=").Append(isStable ? "fusion " : "default ")
 				//.Append("CA=").Append(skinMeshRend.material.GetColor("_GraColorA")).Append(", ")
 				//.Append("CB=").Append(skinMeshRend.material.GetColor("_GraColorB")).Append(", ")
@@ -703,8 +711,7 @@ namespace Wave.Essence.Hand.Model
 				.Append("CCB=").Append(skinMeshRend.material.GetColor("_ConGraColorB")).Append(", ")
 				//.Append("Op=").Append(skinMeshRend.material.GetFloat("_Opacity")).Append(", ")
 				.Append("LOp=").Append(skinMeshRend.material.GetFloat("_line_opacity")).Append(", ")
-				.Append("Th=").Append(skinMeshRend.material.GetFloat("_OutlineThickness"))
-				.ToString());
+				.Append("Th=").Append(skinMeshRend.material.GetFloat("_OutlineThickness")));
 		}
 
 		// This is only used for OEM config. Customized hand didn't need this.
@@ -734,7 +741,8 @@ namespace Wave.Essence.Hand.Model
 				}
 				else
 				{
-					PrintGPLDebug("Invalid scale");
+					if (Log.gpl.Print)
+						Log.d(TAG, HSB.Append("Invalid scale"));
 				}
 			}
 
@@ -747,10 +755,22 @@ namespace Wave.Essence.Hand.Model
 			BonePoses[(int)HandManager.HandJoint.Wrist].localScale = wristScale;
 
 			// 2. Updates the wrist local position
-			for (int i = 0; i < BonePoses.Length; i++)
+			if (useInputDevice)
 			{
-				GetJointPosition(boneMap[i].BoneID, ref s_JointPosition[(int)boneMap[i].BoneID], IsLeft);
-				GetJointRotation(boneMap[i].BoneID, ref s_JointRotation[(int)boneMap[i].BoneID], IsLeft);
+				if (!GetWaveBones())
+				{
+					if (Log.gpl.Print)
+						Log.d(TAG, "Fail to get bones data");
+					return;
+				}
+			}
+			else
+			{
+				for (int i = 0; i < BonePoses.Length; i++)
+				{
+					GetJointPosition(boneMap[i].BoneID, ref s_JointPosition[(int)boneMap[i].BoneID], IsLeft);
+					GetJointRotation(boneMap[i].BoneID, ref s_JointRotation[(int)boneMap[i].BoneID], IsLeft);
+				}
 			}
 
 			BonePoses[(int)HandManager.HandJoint.Wrist].localPosition = s_JointPosition[(int)HandManager.HandJoint.Wrist];
@@ -793,12 +813,81 @@ namespace Wave.Essence.Hand.Model
 					else
 					{
 						// use translate to simulate rotation
-						//Log.gpl.d(LOG_TAG, BonePoses[i].transform.name + " no rotation");
+						//Log.gpl.d(TAG, BonePoses[i].transform.name + " no rotation");
 					}
 				}
 			}
 			*/
 		}
+
+		static List<Bone>[] fingersXR = new List<Bone>[5]
+		{
+			new List<Bone>(),
+			new List<Bone>(),
+			new List<Bone>(),
+			new List<Bone>(),
+			new List<Bone>()
+		};
+		Bone palmXR;
+		Bone WristXR;
+
+		private bool GetXRBones()
+		{
+			if (!foundHandDev || !handDev.isValid) return false;
+			if (handDev.TryGetFeatureValue(CommonUsages.handData, out UnityEngine.XR.Hand hand))
+			{
+				bool ret = true;
+				ret &= hand.TryGetRootBone(out palmXR);
+				ret &= palmXR.TryGetParentBone(out WristXR);
+
+				for (int i = 0; i < 5; i++)
+					ret &= hand.TryGetFingerBones((HandFinger)i, fingersXR[i]);
+				return ret;
+			}
+			return false;
+		}
+
+		private bool GetWaveBones()
+		{
+			if (!GetXRBones()) return false;
+			bool ret = true;
+			ret &= palmXR.TryGetPosition(out s_JointPosition[0]);
+			ret &= palmXR.TryGetRotation(out s_JointRotation[0]);
+			ret &= WristXR.TryGetPosition(out s_JointPosition[1]);
+			ret &= WristXR.TryGetRotation(out s_JointRotation[1]);
+			int shiftId = 2;
+			for (int i = 0; i < 4; i++)
+			{
+				ret &= fingersXR[(int)HandFinger.Thumb][i].TryGetPosition(out s_JointPosition[i + shiftId]);
+				ret &= fingersXR[(int)HandFinger.Thumb][i].TryGetRotation(out s_JointRotation[i + shiftId]);
+			}
+			shiftId += 4;
+			for (int i = 0; i < 5; i++)
+			{
+				ret &= fingersXR[(int)HandFinger.Index][i].TryGetPosition(out s_JointPosition[i + shiftId]);
+				ret &= fingersXR[(int)HandFinger.Index][i].TryGetRotation(out s_JointRotation[i + shiftId]);
+			}
+			shiftId += 5;
+			for (int i = 0; i < 5; i++)
+			{
+				ret &= fingersXR[(int)HandFinger.Middle][i].TryGetPosition(out s_JointPosition[i + shiftId]);
+				ret &= fingersXR[(int)HandFinger.Middle][i].TryGetRotation(out s_JointRotation[i + shiftId]);
+			}
+			shiftId += 5;
+			for (int i = 0; i < 5; i++)
+			{
+				ret &= fingersXR[(int)HandFinger.Ring][i].TryGetPosition(out s_JointPosition[i + shiftId]);
+				ret &= fingersXR[(int)HandFinger.Ring][i].TryGetRotation(out s_JointRotation[i + shiftId]);
+			}
+			shiftId += 5;
+			for (int i = 0; i < 5; i++)
+			{
+				ret &= fingersXR[(int)HandFinger.Pinky][i].TryGetPosition(out s_JointPosition[i + shiftId]);
+				ret &= fingersXR[(int)HandFinger.Pinky][i].TryGetRotation(out s_JointRotation[i + shiftId]);
+			}
+			return true;
+		}
+
 
 		private bool GetJointPosition(HandManager.HandJoint joint, ref Vector3 position, bool isLeft)
 		{
@@ -824,6 +913,53 @@ namespace Wave.Essence.Hand.Model
 			return HandManager.Instance.GetHandConfidence(isLeft);
 		}
 
+		private bool IsPoseValid()
+		{
+			bool isPoseValid = false;
+			if (hasIMManager)
+			{
+				currInteractionMode = ClientInterface.InteractionMode;
+
+				if (currInteractionMode != preInteractionMode)
+				{
+					Log.d(TAG, HSB.Append("Interaction mode changed to ").Append(currInteractionMode));
+					preInteractionMode = currInteractionMode;
+
+					if (currInteractionMode == XR_InteractionMode.Controller)
+					{
+						// show electronic hand?
+						bool isSupported = Interop.WVR_ControllerSupportElectronicHand();
+
+						showECHand = (isSupported && showElectronicHandInControllerMode);
+
+						Log.d(TAG, HSB.Append("Device support electronic hand? ").Append(isSupported).Append(", show electronic hand in controller mode? ").Append(showElectronicHandInControllerMode));
+					}
+				}
+
+				if (ClientInterface.InteractionMode == XR_InteractionMode.Hand)
+				{
+					if (useInputDevice)
+						handDev.TryGetFeatureValue(CommonUsages.isTracked, out isPoseValid);
+					else
+						isPoseValid = (HandManager.Instance != null) &&
+							(HandManager.Instance.IsHandPoseValid(HandManager.TrackerType.Natural, IsLeft));
+				}
+
+				if (ClientInterface.InteractionMode == XR_InteractionMode.Controller)
+					isPoseValid = showECHand && (HandManager.Instance != null) &&
+						(HandManager.Instance.IsHandPoseValid(HandManager.TrackerType.Electronic, IsLeft));
+			}
+			else
+			{
+				if (useInputDevice)
+					handDev.TryGetFeatureValue(CommonUsages.isTracked, out isPoseValid);
+				else
+					isPoseValid = (HandManager.Instance != null) &&
+						(HandManager.Instance.IsHandPoseValid(HandManager.TrackerType.Natural, IsLeft));
+			}
+			return isPoseValid;
+		}
+
 		XR_InteractionMode preInteractionMode = XR_InteractionMode.Default;
 		XR_InteractionMode currInteractionMode;
 
@@ -836,70 +972,38 @@ namespace Wave.Essence.Hand.Model
 				CheckMaterial();
 			}
 
-			bool showHand = false;
-
 			if (Hand == null)
 				return;
 
-			if (hasIMManager)
-			{
-				currInteractionMode = ClientInterface.InteractionMode;
+			bool isFocused = ClientInterface.IsFocused;
+			bool isPoseValid = false;
+			if (isFocused)
+				isPoseValid = IsPoseValid();
 
-				if (currInteractionMode != preInteractionMode)
-				{
-					DEBUG("Interaction mode changed to " + currInteractionMode);
-					preInteractionMode = currInteractionMode;
+			bool showHand = isPoseValid && isFocused;
 
-					if (currInteractionMode == XR_InteractionMode.Controller)
-					{
-						// show electronic hand?
-						bool isSupported = Interop.WVR_ControllerSupportElectronicHand();
+			if (Log.gpl.Print)
+				Log.d(TAG, HSB
+					.Append("Pose isValid: ").Append(isPoseValid)
+					.Append(", isFocused").Append(isFocused)
+					.Append(", showHand: ").Append(showHand)
+					.Append(", Interaction Mode: ").Append(hasIMManager));
 
-						showECHand = (isSupported && showElectronicHandInControllerMode);
-
-						DEBUG("Device support electronic hand? " + isSupported + ", show electronic hand in controller mode? " + showElectronicHandInControllerMode);
-					}
-				}
-
-				if (ClientInterface.InteractionMode == XR_InteractionMode.Hand)
-				{
-					showHand = ((HandManager.Instance != null) &&
-						(HandManager.Instance.IsHandPoseValid(HandManager.TrackerType.Natural, IsLeft)) &&
-						ClientInterface.IsFocused);
-				}
-
-				if (ClientInterface.InteractionMode == XR_InteractionMode.Controller)
-				{
-					showHand = (showECHand && (HandManager.Instance != null) &&
-						(HandManager.Instance.IsHandPoseValid(HandManager.TrackerType.Electronic, IsLeft)) &&
-						ClientInterface.IsFocused);
-				}
-			} else
-			{
-				showHand = ((HandManager.Instance != null) &&
-							(HandManager.Instance.IsHandPoseValid(IsLeft)) &&
-							ClientInterface.IsFocused);
-			}
-
-			if (HandManager.Instance != null)
-			{
-				PrintGPLDebug("Pose is valid: " + (HandManager.Instance.IsHandPoseValid(IsLeft)));
-			}
-
-			PrintGPLDebug("Check interaction Mode: " + hasIMManager + ", showHand: " + showHand + ", has focus: " + ClientInterface.IsFocused);
-
-			Hand.SetActive(showHand);
-
+			if (Hand.activeInHierarchy != showHand)
+				Hand.SetActive(showHand);
 			if (!showHand)
 				return;
 
+			Profiler.BeginSample("UpdateBonePose");
 			UpdateBonePose();
+			Profiler.EndSample();
 
 			if (showConfidenceAsAlpha)
 			{
 				float conValue = GetHandConfidence(IsLeft);
 
-				PrintGPLDebug("Confidence value: " + conValue);
+				if (Log.gpl.Print)
+					Log.d(TAG, HSB.Append("Confidence value: ").Append(conValue));
 
 				var color = Hand.GetComponent<Renderer>().material.color;
 				color.a = conValue > minAlpha ? conValue : minAlpha;
@@ -925,33 +1029,33 @@ namespace Wave.Essence.Hand.Model
 			}
 
 			useRuntimeModel = GetNaturalHandModel();
-			DEBUG("CheckLoadModel() useRuntimeModel: " + useRuntimeModel);
+			Log.d(TAG, HSB.Append("CheckLoadModel() useRuntimeModel: ").Append(useRuntimeModel));
 			if (useRuntimeModel)
 			{
 				if (customizedSkinMeshRend != null)
 				{
 					customizedSkinMeshRend.gameObject.SetActive(false);
-					DEBUG("CheckLoadModel() disable " + customizedSkinMeshRend.gameObject.name);
+					Log.d(TAG, HSB.Append("CheckLoadModel() disable ").Append(customizedSkinMeshRend.gameObject.name));
 				}
 				if (skinMeshRend != null)
 				{
 					skinMeshRend.gameObject.SetActive(true);
-					DEBUG("CheckLoadModel() enable " + skinMeshRend.gameObject.name);
+					Log.d(TAG, HSB.Append("CheckLoadModel() enable ").Append(skinMeshRend.gameObject.name));
 					Hand = skinMeshRend.gameObject;
-					DEBUG("CheckLoadModel() Set Hand to " + Hand.name);
+					Log.d(TAG, HSB.Append("CheckLoadModel() Set Hand to ").Append(Hand.name));
 				}
 
 				BonePoses = runtimeBonePoses;
 				for (int i = 0; i < boneMap.Length; i++)
 				{
-					DEBUG("CheckLoadModel() " + boneMap[i].DisplayName + " --> " + BonePoses[i].name);
+					Log.d(TAG, HSB.Append("CheckLoadModel() ").Append(boneMap[i].DisplayName).Append(" --> ").Append(BonePoses[i].name));
 				}
 			}
 		}
 
 		void OnOEMConfigChanged()
 		{
-			DEBUG("OnOEMConfigChanged()");
+			Log.d(TAG, HSB.Append("OnOEMConfigChanged()"));
 			ReadJson();
 			SetRuntimeModelMaterialStyle(isHandStable);
 		}
@@ -960,7 +1064,7 @@ namespace Wave.Essence.Hand.Model
 		{
 			if (BonePoses.Length != boneMap.Length)
 			{
-				DEBUG("OnEnable() Length of BonePoses is not equal to length of boneMap, skip!");
+				Log.d(TAG, HSB.Append("OnEnable() Length of BonePoses is not equal to length of boneMap, skip!"));
 				return;
 			}
 
@@ -975,12 +1079,12 @@ namespace Wave.Essence.Hand.Model
 			{
 				customizedSkinMeshRend.gameObject.SetActive(true);
 				Hand = customizedSkinMeshRend.gameObject;
-				DEBUG("OnEnable() Set Hand to " + Hand.name);
+				Log.d(TAG, HSB.Append("OnEnable() Set Hand to ").Append(Hand.name));
 			}
 
 			for (int i = 0; i < boneMap.Length; i++)
 			{
-				DEBUG("OnEnable() " + boneMap[i].DisplayName + " --> " + BonePoses[i].name);
+				Log.d(TAG, HSB.Append("OnEnable() ").Append(boneMap[i].DisplayName).Append(" --> ").Append(BonePoses[i].name));
 			}
 
 			GeneralEvent.Listen(GeneralEvent.INTERACTION_MODE_MANAGER_READY, OnInteractionModeManagerReady);
@@ -996,7 +1100,46 @@ namespace Wave.Essence.Hand.Model
 		// Start is called before the first frame update
 		void Start()
 		{
+			StartCoroutine(CheckInputDevice());
+		}
 
+		IEnumerator CheckInputDevice()
+		{
+			while (Utils.InputSubsystem == null) yield return null;
+			List<InputDevice> devices = new List<InputDevice>();
+
+			var wfs = new WaitForSeconds(0.5f);
+			Log.d(TAG, HSB.Append("Looking for input device..."));
+			while (true)
+			{
+				if (!foundHandDev)
+				{
+					InputDevices.GetDevices(devices);
+					for (int i = 0; i < devices.Count; i++)
+					{
+						if (InputDeviceHand.IsHandDevice(devices[i], IsLeft))
+						{
+							foundHandDev = true;
+							handDev = devices[i];
+							Log.d(TAG, HSB.Append("Found input device"));
+							break;
+						}
+					}
+					yield return wfs;
+					if (Log.gpl.Print)
+						Log.d(TAG, HSB.Append("Still looking for input device..."));
+				}
+				else if (!handDev.isValid)
+				{
+					Log.d(TAG, HSB.Append("handDev.is not valid"));
+					yield return wfs;
+				}
+				else
+				{
+					// Found devices
+					yield return wfs;
+				}
+			}
 		}
 
 		private bool hasIMManager = false;

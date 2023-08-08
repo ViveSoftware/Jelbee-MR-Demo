@@ -1,9 +1,12 @@
-Shader "Unlit/GeneratedSceneMeshWireframe"
+Shader "HTC/MRRoomSetup/UVWireFrame"
 {
+	//Verticies and UVs of mesh must be preprocessed in order to use this shader.
+
 	Properties
 	{
 		_LineColor("Line Color", Color) = (1,1,1,1)
 		_LineThickness("Line Thickness", float) = 0.5
+		_FaceColor("Face Color", Color) = (1,1,1,1)
 	}
 
 		SubShader{
@@ -35,6 +38,7 @@ Shader "Unlit/GeneratedSceneMeshWireframe"
 
 					fixed4 _LineColor;
 					float _LineThickness;
+					fixed4 _FaceColor;
 
 					v2f vert(appdata_t v)
 					{
@@ -61,6 +65,8 @@ Shader "Unlit/GeneratedSceneMeshWireframe"
 
 					fixed4 frag(v2f i) : SV_Target
 					{
+						fixed4 outputCol;
+
 						float lineWidthInPixels = _LineThickness;
 						float lineAntiaAliasWidthInPixels = 1;
 
@@ -96,9 +102,17 @@ Shader "Unlit/GeneratedSceneMeshWireframe"
 
 						float lineAlpha = 1.0 - smoothstep(1.0,1.0 + (lineAntiaAliasWidthInPixels / lineWidthInPixels),closestNormalizedDistance);
 
-						lineAlpha *= _LineColor.a;
+						if (lineAlpha < 0.99) //Output face color instead
+						{
+							outputCol = _FaceColor;
+						}
+						else
+						{
+							lineAlpha *= _LineColor.a;
+							outputCol = fixed4(_LineColor.rgb, lineAlpha);
+						}
 
-						return fixed4(_LineColor.rgb,lineAlpha);
+						return outputCol;
 					}
 				ENDCG
 			}

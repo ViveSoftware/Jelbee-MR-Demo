@@ -8,26 +8,26 @@
       "url": "https://npm-registry.vive.com"
     },
     "com.htc.upm.wave.essence": {
-      "version": "5.2.1-r.1",
+      "version": "5.3.1-r.2",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.htc.upm.wave.xrsdk": "5.2.1-r.1",
-        "com.htc.upm.wave.native": "5.2.1-r.1"
+        "com.htc.upm.wave.xrsdk": "5.3.1-r.2",
+        "com.htc.upm.wave.native": "5.3.1-r.2"
       },
       "url": "https://npm-registry.vive.com"
     },
     "com.htc.upm.wave.native": {
-      "version": "5.2.1-r.1",
-      "depth": 1,
+      "version": "5.3.1-r.2",
+      "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.htc.upm.wave.xrsdk": "5.2.1-r.1"
+        "com.htc.upm.wave.xrsdk": "5.3.1-r.2"
       },
       "url": "https://npm-registry.vive.com"
     },
     "com.htc.upm.wave.xrsdk": {
-      "version": "5.2.1-r.1",
+      "version": "5.3.1-r.2",
       "depth": 0,
       "source": "registry",
       "dependencies": {

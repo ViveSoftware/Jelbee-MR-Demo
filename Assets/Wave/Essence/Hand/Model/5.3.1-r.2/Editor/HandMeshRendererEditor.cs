@@ -44,6 +44,8 @@ namespace Wave.Essence.Hand.Model
 			MessageType.None);
 			handMeshRenderer.showConfidenceAsAlpha = EditorGUILayout.Toggle("Show Confidence As Alpha", handMeshRenderer.showConfidenceAsAlpha);
 
+			handMeshRenderer.useInputDevice = EditorGUILayout.Toggle(new GUIContent("Use InputDevice", "Use XR.InputDevice to update bones directly.  Will be faster but no Wave Essence support."), handMeshRenderer.useInputDevice);
+
 			EditorGUILayout.HelpBox("Use skeleton, mesh and pose from runtime",
 			MessageType.None);
 			handMeshRenderer.useRuntimeModel = EditorGUILayout.Toggle("Use Runtime Model", handMeshRenderer.useRuntimeModel);

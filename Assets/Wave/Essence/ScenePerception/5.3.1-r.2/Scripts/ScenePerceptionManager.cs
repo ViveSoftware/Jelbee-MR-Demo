@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.XR;
@@ -429,7 +426,7 @@ namespace Wave.Essence.ScenePerception
 				currentBuffer.vertexCapacityInput = currentBuffer.vertexCountOutput;
 				currentBuffer.indexCapacityInput = currentBuffer.indexCountOutput;
 
-				Log.d(LOG_TAG, "WVR_GetSceneMeshBuffer 1 Vertex Count Output: " + currentBuffer.vertexCapacityInput + ", Index Count Output: " + currentBuffer.indexCapacityInput);
+				//Log.d(LOG_TAG, "WVR_GetSceneMeshBuffer 1 Vertex Count Output: " + currentBuffer.vertexCapacityInput + ", Index Count Output: " + currentBuffer.indexCapacityInput);
 			}
 
 			WVR_Vector3f_t[] vertexBufferArray = new WVR_Vector3f_t[currentBuffer.vertexCapacityInput];
@@ -511,20 +508,17 @@ namespace Wave.Essence.ScenePerception
 
 			Vector3 planePositionUnity = Vector3.zero;
 			Quaternion planeRotationUnity = Quaternion.identity;
-			Coordinate.GetVectorFromGL(planePose.position, out planePositionUnity);
-			Coordinate.GetQuaternionFromGL(planePose.rotation, out planeRotationUnity);
 
-			planeRotationUnity *= Quaternion.Euler(0, 180f, 0);
-
-			if (applyTrackingOriginCorrection && trackingOrigin != null) //Apply origin correction to the anchor pose
+			if (applyTrackingOriginCorrection) //Apply origin correction to the anchor pose
 			{
-				Matrix4x4 trackingSpaceOriginTRS = Matrix4x4.TRS(trackingOrigin.transform.position, trackingOrigin.transform.rotation, Vector3.one);
-				Matrix4x4 worldSpacePlanePoseTRS = Matrix4x4.TRS(planePositionUnity, planeRotationUnity, Vector3.one);
+				ApplyTrackingOriginCorrectionToPlanePose(scenePlane, out planePositionUnity, out planeRotationUnity);
+			}
+			else
+			{
+				Coordinate.GetVectorFromGL(planePose.position, out planePositionUnity);
+				Coordinate.GetQuaternionFromGL(planePose.rotation, out planeRotationUnity);
 
-				Matrix4x4 trackingSpaceAnchorPoseTRS = trackingSpaceOriginTRS * worldSpacePlanePoseTRS;
-
-				planePositionUnity = trackingSpaceAnchorPoseTRS.GetColumn(3); //4th Column of TRS Matrix is the position
-				planeRotationUnity = Quaternion.LookRotation(trackingSpaceAnchorPoseTRS.GetColumn(2), trackingSpaceAnchorPoseTRS.GetColumn(1));
+				planeRotationUnity *= Quaternion.Euler(0, 180f, 0);
 			}
 
 			//Log.d(LOG_TAG, "GenerateScenePlaneMesh Position: " + planePositionUnity.ToString());
@@ -605,12 +599,7 @@ namespace Wave.Essence.ScenePerception
 		/// </returns>
 		public static bool IsUUIDEqual(WVR_Uuid uuid1, WVR_Uuid uuid2)
 		{
-			if (uuid1.data == null || uuid2.data == null || uuid1.data.Length!= uuid2.data.Length) return false;
-
-			Byte[] uuid1Data = uuid1.data;
-			Byte[] uuid2Data = uuid2.data;
-
-			return uuid1Data.SequenceEqual(uuid2Data);
+			return WVRStructCompare.IsUUIDEqual(uuid1, uuid2);
 		}
 
 		/// <summary>
@@ -735,10 +724,10 @@ namespace Wave.Essence.ScenePerception
 			}
 
 			WVR_SpatialAnchorName anchorNameWVR = default(WVR_SpatialAnchorName);
-			anchorNameWVR.name = new char[anchorName.Length];
+			anchorNameWVR.name = new char[256];
 			anchorName.CopyTo(anchorNameWVR.name, 0);
 
-			if (applyTrackingOriginCorrection && trackingOrigin != null) //Apply origin correction to the anchor pose
+			if (applyTrackingOriginCorrection && trackingOrigin != null) //Apply origin correction to the anchor pose (world to tracking space)
 			{
 				Matrix4x4 trackingSpaceOriginTRS = Matrix4x4.TRS(trackingOrigin.transform.position, trackingOrigin.transform.rotation, Vector3.one);
 				Matrix4x4 worldSpaceAnchorPoseTRS = Matrix4x4.TRS(anchorPosition, Quaternion.Euler(anchorRotation), Vector3.one);
@@ -827,7 +816,7 @@ namespace Wave.Essence.ScenePerception
 			anchorNameWVR.name = new char[256];
 			anchorName.CopyTo(anchorNameWVR.name, 0);
 
-			if (applyTrackingOriginCorrection && trackingOrigin != null) //Apply origin correction to the anchor pose
+			if (applyTrackingOriginCorrection && trackingOrigin != null) //Apply origin correction to the anchor pose (world to tracking space)
 			{
 				Matrix4x4 trackingSpaceOriginTRS = Matrix4x4.TRS(trackingOrigin.transform.position, trackingOrigin.transform.rotation, Vector3.one);
 				Matrix4x4 worldSpaceAnchorPoseTRS = Matrix4x4.TRS(anchorPosition, anchorRotation, Vector3.one);
@@ -1020,19 +1009,15 @@ namespace Wave.Essence.ScenePerception
 			}
 			else
 			{
-				anchorTrackingState = anchorState.trackingState;
-				Coordinate.GetVectorFromGL(anchorState.pose.position, out anchorPosition);
-				Coordinate.GetQuaternionFromGL(anchorState.pose.rotation, out anchorRotation);
-
-				if (applyTrackingOriginCorrection && trackingOrigin != null) //Apply origin correction to the anchor pose
+				if (applyTrackingOriginCorrection) //Apply origin correction to the anchor pose
 				{
-					Matrix4x4 trackingSpaceOriginTRS = Matrix4x4.TRS(trackingOrigin.transform.position, trackingOrigin.transform.rotation, Vector3.one);
-					Matrix4x4 worldSpaceAnchorPoseTRS = Matrix4x4.TRS(anchorPosition, anchorRotation, Vector3.one);
-
-					Matrix4x4 trackingSpaceAnchorPoseTRS = trackingSpaceOriginTRS * worldSpaceAnchorPoseTRS;
-
-					anchorPosition = trackingSpaceAnchorPoseTRS.GetColumn(3); //4th Column of TRS Matrix is the position
-					anchorRotation = Quaternion.LookRotation(trackingSpaceAnchorPoseTRS.GetColumn(2), trackingSpaceAnchorPoseTRS.GetColumn(1));
+					ApplyTrackingOriginCorrectionToAnchorPose(anchorState, out anchorPosition, out anchorRotation);
+				}
+				else
+				{
+					anchorTrackingState = anchorState.trackingState;
+					Coordinate.GetVectorFromGL(anchorState.pose.position, out anchorPosition);
+					Coordinate.GetQuaternionFromGL(anchorState.pose.rotation, out anchorRotation);
 				}
 
 				Array.Resize(ref anchorName, anchorState.anchorName.name.Length);
@@ -1067,12 +1052,12 @@ namespace Wave.Essence.ScenePerception
 			if (trackingOrigin != null)
 			{
 				Matrix4x4 trackingSpaceOriginTRS = Matrix4x4.TRS(trackingOrigin.transform.position, trackingOrigin.transform.rotation, Vector3.one);
-				Matrix4x4 worldSpaceAnchorPoseTRS = Matrix4x4.TRS(anchorPosition, anchorRotation, Vector3.one);
+				Matrix4x4 trackingSpaceAnchorPoseTRS = Matrix4x4.TRS(anchorPosition, anchorRotation, Vector3.one);
 
-				Matrix4x4 trackingSpaceAnchorPoseTRS = trackingSpaceOriginTRS * worldSpaceAnchorPoseTRS;
+				Matrix4x4 worldSpaceAnchorPoseTRS = trackingSpaceOriginTRS * trackingSpaceAnchorPoseTRS;
 
-				anchorPosition = trackingSpaceAnchorPoseTRS.GetColumn(3); //4th Column of TRS Matrix is the position
-				anchorRotation = Quaternion.LookRotation(trackingSpaceAnchorPoseTRS.GetColumn(2), trackingSpaceAnchorPoseTRS.GetColumn(1));
+				anchorPosition = worldSpaceAnchorPoseTRS.GetColumn(3); //4th Column of TRS Matrix is the position
+				anchorRotation = Quaternion.LookRotation(worldSpaceAnchorPoseTRS.GetColumn(2), worldSpaceAnchorPoseTRS.GetColumn(1));
 			}
 		}
 
@@ -1113,22 +1098,22 @@ namespace Wave.Essence.ScenePerception
 		public static WVR_PoseOriginModel GetCurrentPoseOriginModel()
 		{
 			XRInputSubsystem subsystem = Utils.InputSubsystem;
+			WVR_PoseOriginModel currentPoseOriginModel = WVR_PoseOriginModel.WVR_PoseOriginModel_OriginOnGround;
 
 			if (subsystem != null)
 			{
 				TrackingOriginModeFlags trackingOriginMode = subsystem.GetTrackingOriginMode();
+				
 
-				switch (trackingOriginMode)
+				bool getOriginSuccess = ClientInterface.GetOrigin(trackingOriginMode, ref currentPoseOriginModel);
+
+				if (getOriginSuccess)
 				{
-					default:
-					case TrackingOriginModeFlags.Floor:
-						return WVR_PoseOriginModel.WVR_PoseOriginModel_OriginOnGround;
-					case TrackingOriginModeFlags.Device:
-						return WVR_PoseOriginModel.WVR_PoseOriginModel_OriginOnHead;
+					return currentPoseOriginModel;
 				}
 			}
 
-			return WVR_PoseOriginModel.WVR_PoseOriginModel_OriginOnGround;
+			return currentPoseOriginModel;
 		}
 
 		public static class MeshGenerationHelper

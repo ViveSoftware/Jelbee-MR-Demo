@@ -1,8 +1,10 @@
 {
     "name": "Wave.Essence.Hand.Model",
+    "rootNamespace": "",
     "references": [
         "Wave.Essence",
-        "Wave.Native"
+        "Wave.Native",
+        "Wave.XRSDK"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

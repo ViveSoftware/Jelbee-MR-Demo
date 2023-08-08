@@ -39,13 +39,15 @@ namespace Wave.Essence.ScenePerception.Sample
         {
             if (!isSceneComponentRunning) return;
 
+			StopScenePerception();
+
 			scenePerceptionManager.StopScene();
 			isSceneComponentRunning = false;
         }
 
 		public void StartScenePerception()
 		{
-			if (isSceneComponentRunning)
+			if (isSceneComponentRunning && !isScenePerceptionStarted)
 			{
 				if (currentPerceptionTarget == WVR_ScenePerceptionTarget.WVR_ScenePerceptionTarget_SceneMesh && !SceneMeshPermissionHelper.permissionGranted)
 				{
@@ -62,7 +64,20 @@ namespace Wave.Essence.ScenePerception.Sample
 			}
 		}
 
-        public void ScenePerceptionGetState()
+		public void StopScenePerception()
+		{
+			if (isSceneComponentRunning && isScenePerceptionStarted)
+			{
+				WVR_Result result = scenePerceptionManager.StopScenePerception(currentPerceptionTarget);
+
+				if (result == WVR_Result.WVR_Success)
+				{
+					isScenePerceptionStarted = false;
+				}
+			}
+		}
+
+		public void ScenePerceptionGetState()
         {
             WVR_ScenePerceptionState latestPerceptionState = WVR_ScenePerceptionState.WVR_ScenePerceptionState_Empty;
             WVR_Result result = scenePerceptionManager.GetScenePerceptionState(currentPerceptionTarget, ref latestPerceptionState);
