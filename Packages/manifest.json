@@ -1,9 +1,9 @@
 {
   "dependencies": {
     "com.htc.upm.vive-input-utility": "1.18.0",
-    "com.htc.upm.wave.essence": "5.2.1-r.1",
-    "com.htc.upm.wave.native": "5.2.0-r.4.1",
-    "com.htc.upm.wave.xrsdk": "5.2.1-r.1",
+    "com.htc.upm.wave.essence": "5.3.1-r.2",
+    "com.htc.upm.wave.native": "5.3.1-r.2",
+    "com.htc.upm.wave.xrsdk": "5.3.1-r.2",
     "com.unity.collab-proxy": "1.2.16",
     "com.unity.ide.rider": "1.2.1",
     "com.unity.ide.visualstudio": "2.0.8",

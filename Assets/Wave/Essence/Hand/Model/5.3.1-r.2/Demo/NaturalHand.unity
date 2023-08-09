@@ -1971,8 +1971,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 60}
-  m_SizeDelta: {x: 240, y: 30}
+  m_AnchoredPosition: {x: 1.4, y: 54}
+  m_SizeDelta: {x: 290, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &339524979
 MonoBehaviour:
@@ -3435,8 +3435,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 19.3}
-  m_SizeDelta: {x: 240, y: 50}
+  m_AnchoredPosition: {x: -23.7, y: 14}
+  m_SizeDelta: {x: 240, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &623491322
 MonoBehaviour:
@@ -4347,8 +4347,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -30.7}
-  m_SizeDelta: {x: 240, y: 50}
+  m_AnchoredPosition: {x: -23.7, y: -26}
+  m_SizeDelta: {x: 240, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &712131703
 MonoBehaviour:
@@ -4630,7 +4630,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 90}
+  m_AnchoredPosition: {x: -23.7, y: 90}
   m_SizeDelta: {x: 240, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &728675686
@@ -5990,7 +5990,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -70.7}
+  m_AnchoredPosition: {x: -23.7, y: -66}
   m_SizeDelta: {x: 240, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1046317618
@@ -6480,7 +6480,9 @@ MonoBehaviour:
   m_Pointer: {fileID: 689025412}
   m_Hand: 0
   m_UsePose: 1
+  m_UseDefaultPinch: 0
   m_PinchStrength: 0.5
+  m_PinchRelease: 0.5
   m_AlwaysEnable: 1
 --- !u!20 &1070302511
 Camera:
@@ -11457,7 +11459,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -1.84, y: 8.82}
-  m_SizeDelta: {x: 250, y: 220}
+  m_SizeDelta: {x: 300, y: 220}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2043745290
 GameObject:
@@ -12829,7 +12831,9 @@ MonoBehaviour:
   m_Pointer: {fileID: 3549781878113238244}
   m_Hand: 1
   m_UsePose: 1
+  m_UseDefaultPinch: 0
   m_PinchStrength: 0.5
+  m_PinchRelease: 0.5
   m_AlwaysEnable: 1
 --- !u!20 &3549781878763660939
 Camera:
