@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.htc.upm.vive-input-utility": {
-      "version": "1.18.0",
+      "version": "1.18.3",
       "depth": 0,
       "source": "registry",
       "dependencies": {},

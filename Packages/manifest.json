@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.htc.upm.vive-input-utility": "1.18.0",
+    "com.htc.upm.vive-input-utility": "1.18.3",
     "com.htc.upm.wave.essence": "5.3.1-r.2",
     "com.htc.upm.wave.native": "5.3.1-r.2",
     "com.htc.upm.wave.xrsdk": "5.3.1-r.2",
