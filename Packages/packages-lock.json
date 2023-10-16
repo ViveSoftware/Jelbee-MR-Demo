@@ -8,32 +8,32 @@
       "url": "https://npm-registry.vive.com"
     },
     "com.htc.upm.wave.essence": {
-      "version": "5.3.1-r.2",
+      "version": "https://github.com/ViveSoftware/VIVE-Wave.git?path=com.htc.upm.wave.essence",
       "depth": 0,
-      "source": "registry",
+      "source": "git",
       "dependencies": {
-        "com.htc.upm.wave.xrsdk": "5.3.1-r.2",
-        "com.htc.upm.wave.native": "5.3.1-r.2"
+        "com.htc.upm.wave.xrsdk": "5.4.0-r.8",
+        "com.htc.upm.wave.native": "5.4.0-r.8"
       },
-      "url": "https://npm-registry.vive.com"
+      "hash": "9c043820327fe72609b8714cec3fbe1bf569cbb3"
     },
     "com.htc.upm.wave.native": {
-      "version": "5.3.1-r.2",
+      "version": "https://github.com/ViveSoftware/VIVE-Wave.git?path=com.htc.upm.wave.native",
       "depth": 0,
-      "source": "registry",
+      "source": "git",
       "dependencies": {
-        "com.htc.upm.wave.xrsdk": "5.3.1-r.2"
+        "com.htc.upm.wave.xrsdk": "5.4.0-r.8"
       },
-      "url": "https://npm-registry.vive.com"
+      "hash": "9c043820327fe72609b8714cec3fbe1bf569cbb3"
     },
     "com.htc.upm.wave.xrsdk": {
-      "version": "5.3.1-r.2",
+      "version": "https://github.com/ViveSoftware/VIVE-Wave.git?path=com.htc.upm.wave.xrsdk",
       "depth": 0,
-      "source": "registry",
+      "source": "git",
       "dependencies": {
         "com.unity.xr.management": "3.2.4"
       },
-      "url": "https://npm-registry.vive.com"
+      "hash": "9c043820327fe72609b8714cec3fbe1bf569cbb3"
     },
     "com.unity.collab-proxy": {
       "version": "1.2.16",
