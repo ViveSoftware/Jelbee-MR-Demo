@@ -1,0 +1,17 @@
+{
+    "name": "Wave.Essence.ScenePerception.Demo",
+    "references": [
+        "GUID:dc6ae5be80485d949a25aa157e051ed8",
+        "GUID:b7c74153ccbcf534aa653a77f62bd182",
+        "GUID:d1e27240abf1fa6469a245fe94f274af"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
