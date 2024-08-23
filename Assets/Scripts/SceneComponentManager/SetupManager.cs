@@ -84,6 +84,13 @@ public class SetupManager : MonoBehaviour
                 lightGizmo.gameObject.SetActive(false);
             }
         }
+
+#if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            StartGame();
+        }
+#endif
     }
 
     private void OnScenePlaneClicked(PlaneController planeController)
