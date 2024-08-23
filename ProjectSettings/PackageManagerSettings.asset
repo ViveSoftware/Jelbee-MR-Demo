@@ -22,7 +22,7 @@ MonoBehaviour:
     m_IsDefault: 1
   - m_Id: scoped:HTC
     m_Name: HTC
-    m_Url: https://npm-registry.vive.com
+    m_Url: http://tv01009052up.htctaipei.htc.com.tw:4873
     m_Scopes:
     - com.htc.upm
     m_IsDefault: 0
@@ -33,13 +33,13 @@ MonoBehaviour:
     m_Original:
       m_Id: scoped:HTC
       m_Name: HTC
-      m_Url: https://npm-registry.vive.com
+      m_Url: http://tv01009052up.htctaipei.htc.com.tw:4873
       m_Scopes:
       - com.htc.upm
       m_IsDefault: 0
     m_Modified: 0
     m_Name: HTC
-    m_Url: https://npm-registry.vive.com
+    m_Url: http://tv01009052up.htctaipei.htc.com.tw:4873
     m_Scopes:
     - com.htc.upm
     m_SelectedScopeIndex: 0

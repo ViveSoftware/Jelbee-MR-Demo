@@ -36,6 +36,10 @@ MonoBehaviour:
   overridePixelDensity: 0
   pixelDensity: 1
   resolutionScale: 1
+  overrideThreadPriority: 0
+  gameThreadPriority: 0
+  renderThreadPriority: -2
+  jobWorkerThreadPriority: 0
   debugLogFlagForNative: 1048335
   debugLogFlagForUnity: 1048335
   overrideLogFlagForNative: 0
@@ -51,11 +55,14 @@ MonoBehaviour:
   displayGamutPreferences: 000000000100000002000000
   enableAutoFallbackForMultiLayer: 1
   allowSpectatorCamera: 0
+  allowSpectatorCameraCapture360Image: 0
   EnableTracker: 0
   EnableNaturalHand: 0
   EnableElectronicHand: 0
   EnableEyeTracking: 0
   EnableEyeExpression: 0
   EnableLipExpression: 0
+  EnableBodyTracking: 0
   EnableScenePerception: 1
-  EnableSceneMesh: 1
+  EnableSceneMesh: 0
+  EnableMarker: 0
