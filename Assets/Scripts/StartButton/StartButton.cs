@@ -88,7 +88,7 @@ public class StartButton : Singleton<StartButton>
     private void Update()
     {
 #if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.Space) && !buttonPressed)
+        if (Input.GetKeyDown(KeyCode.Return) && !buttonPressed)
         {
             StartCoroutine(ButtonPressed());
         }
