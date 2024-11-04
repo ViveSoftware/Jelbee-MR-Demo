@@ -106,14 +106,17 @@ public class PortalSceneManager : Singleton<PortalSceneManager>
 
             Vector3 handPos;
             Vector3 particalPos;
+            Quaternion particalRot;
 #if UNITY_EDITOR
             handPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0.5f);
             handPos = Camera.main.ScreenToWorldPoint(handPos);
             particalPos = handPos;
+            particalRot = Quaternion.identity;
 #else
             VivePose.TryGetHandJointPose(handRole, HandJointName.Palm, out JointPose jointPose);
             handPos = jointPose.pose.pos;
-            particalPos = jointPose.pose.pos + -jointPose.pose.up * 0.02f;
+            particalPos = jointPose.pose.pos + -jointPose.pose.up * 0.05f;
+            particalRot = jointPose.pose.rot;
 #endif
             float distance = Vector3.Distance(handPos, preFramePos);
             if (distance > 1)
@@ -130,6 +133,7 @@ public class PortalSceneManager : Singleton<PortalSceneManager>
             }
 
             handParticle.transform.position = particalPos;
+            handParticle.transform.rotation = particalRot;
 #if UNITY_EDITOR
             handParticle.SetActive(true);
 #else
