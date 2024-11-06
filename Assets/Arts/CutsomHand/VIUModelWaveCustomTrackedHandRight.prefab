@@ -605,11 +605,12 @@ SkinnedMeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d6b94e64223b2ad47999551f93e5beae, type: 2}
   - {fileID: 2100000, guid: ed87499a9b3585f4bb2e7cd96d939502, type: 2}
+  - {fileID: 2100000, guid: 7c5a141e7dd64f1409fe91a3156dfd43, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

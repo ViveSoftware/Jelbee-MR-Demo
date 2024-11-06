@@ -1,5 +1,5 @@
 # Jelbee MR Demo
-Copyright 2022-2023, HTC Corporation. All rights reserved.
+Copyright 2024, HTC Corporation. All rights reserved.
 ## About
 Jelbee MR Demo is an MR experience example for VIVE XR Elite. It demonstrates MR applications such as virtual room setup, gestures, interactions, and grabbing objects into MR. There are four experiences in the Demo:
 +	Whack-A-Mole on the desk 
@@ -7,10 +7,10 @@ Jelbee MR Demo is an MR experience example for VIVE XR Elite. It demonstrates MR
 +	MR Portal 
 +	Grabbing planets into MR
 ## Requirements
-+	VIVE XR Elite
++	VIVE XR Elite, VIVE Focus Vision
 +	Unity 2019.4.28f1 or newer
 +	VIVE Wave XR Plugin 5.2.1-r.1 or newer
-+	VIVE Input Utility 1.18.0
++	VIVE Input Utility 1.18.0 or newer
 ## Settings & Build Setup
 +	Set Build `Settings > Platform` to Android
 + Import [[Customizable Planet Shaders]](https://assetstore.unity.com/packages/vfx/shaders/customizable-planet-shaders-131872) package into project.
@@ -39,6 +39,19 @@ Jelbee MR Demo is an MR experience example for VIVE XR Elite. It demonstrates MR
 +	**SetupManager.cs** : Let user specify the plane corresponding to the key. 
 +	**PortalSceneManager.cs** : The flow of the MR Portal levels and the drawing method of the portal. 
 +	**PortalBallBehaviour.cs** : If you want to add a new portal, you need to inherit this script, such as UniversePortalBall.cs.
++	**Hand Occlusion** : Virtual hand model already support occlusion and virtual lighting *(play on planet of [**Level 3 MR Portal-Universe**](#how-to-play-with-xr-elite))*. If you want to realize occlusion sample, you can follow material on the hand mode prefab `Arts / CutsomHand`.
+> #### Hand Occlusion - Hand Shadow
+> <img src="https://dl.vive.com/open-source/jelbeemr/jelbee_shadow.gif" width="720"/>
+> 
+> In this version, you can turn on shadow setting to feel immersive virtual interaction.
+> 
+> #### Hand Occlusion - Hand Virtual Lighting
+> 
+> <img src="https://dl.vive.com/open-source/jelbeemr/jelbee_light.gif" width="720"/>
+> 
+> In this version, you can use lighting effect overlap on the real hand to feel immersive virtual interaction.
+
+
 ## Third Party Assets
 +	[Customizable Planet Shaders](https://assetstore.unity.com/packages/vfx/shaders/customizable-planet-shaders-131872) (not included in project)
 +	[DOTween](http://dotween.demigiant.com/)

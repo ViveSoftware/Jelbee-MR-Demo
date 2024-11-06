@@ -34,7 +34,11 @@ public class SetupManager : MonoBehaviour
 
         foreach(PlaneController planeController in SceneComponentManager.Instance.PlaneControllers)
         {
-            (planeController as SetupPlaneController).OnClickedHandler += OnScenePlaneClicked;
+            var setupPlaneController = planeController as SetupPlaneController;
+            if (setupPlaneController != null)
+            {
+                setupPlaneController.OnClickedHandler += OnScenePlaneClicked;
+            }
             if(planeController.ShapeType == ShapeTypeEnum.table)
             {
                 deskController = planeController;

@@ -18,10 +18,13 @@ namespace com.HTC.Common
             {
                 PropertyChangedAttribute at = attribute as PropertyChangedAttribute;
 
-                MethodInfo method = property.serializedObject.targetObject.GetType().GetMethod(at.methodName);
+                if (at != null)
+                {
+                    MethodInfo method = property.serializedObject.targetObject.GetType().GetMethod(at.methodName);
 
-                if (method != null && method.GetParameters().Count() == 0)// Only instantiate methods with 0 parameters
-                    method.Invoke(property.serializedObject.targetObject, null);
+                    if (method != null && method.GetParameters().Count() == 0)// Only instantiate methods with 0 parameters
+                        method.Invoke(property.serializedObject.targetObject, null);
+                }
             }
         }
     }

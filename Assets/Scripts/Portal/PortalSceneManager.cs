@@ -106,14 +106,17 @@ public class PortalSceneManager : Singleton<PortalSceneManager>
 
             Vector3 handPos;
             Vector3 particalPos;
+            Quaternion particalRot;
 #if UNITY_EDITOR
             handPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0.5f);
             handPos = Camera.main.ScreenToWorldPoint(handPos);
             particalPos = handPos;
+            particalRot = Quaternion.identity;
 #else
             VivePose.TryGetHandJointPose(handRole, HandJointName.Palm, out JointPose jointPose);
             handPos = jointPose.pose.pos;
-            particalPos = jointPose.pose.pos + -jointPose.pose.up * 0.02f;
+            particalPos = jointPose.pose.pos + -jointPose.pose.up * 0.05f;
+            particalRot = jointPose.pose.rot;
 #endif
             float distance = Vector3.Distance(handPos, preFramePos);
             if (distance > 1)
@@ -130,6 +133,7 @@ public class PortalSceneManager : Singleton<PortalSceneManager>
             }
 
             handParticle.transform.position = particalPos;
+            handParticle.transform.rotation = particalRot;
 #if UNITY_EDITOR
             handParticle.SetActive(true);
 #else
@@ -457,88 +461,91 @@ public class PortalSceneManager : Singleton<PortalSceneManager>
             if (i < 3) iPlus = i + 1;
             else iPlus = 0;
 
-            Vector3 toSide = CommonFormula.PointFromPointToLine(planeController.Data.Points[i], planeController.Data.Points[iPlus], destination);
-            if (Vector3.Distance(toSide, destination) < radiusLength)
+            if (planeController != null)
             {
-                if (planeController.Data.Points[i].y == planeController.Data.Points[iPlus].y)
+                Vector3 toSide = CommonFormula.PointFromPointToLine(planeController.Data.Points[i], planeController.Data.Points[iPlus], destination);
+                if (Vector3.Distance(toSide, destination) < radiusLength)
                 {
-                    Debug.Log("[PortalSceneManager][CreatPortalBall] Hit floor or ceiling.");
-                    if (portalType != 3) 
+                    if (planeController.Data.Points[i].y == planeController.Data.Points[iPlus].y)
                     {
-                        tryCreatingPortal = false;
-                        return;
-                    }
-                }
-                else
-                {
-                    Vector3 secondWallCenter = Vector3.zero;
-                    bool getSecondWall = false;
-                    for (int j = 0; j < SceneComponentManager.Instance.Planes.Count; j++)
-                    {
-                        if (SceneComponentManager.Instance.Planes[j].Type == "wall")
+                        Debug.Log("[PortalSceneManager][CreatPortalBall] Hit floor or ceiling.");
+                        if (portalType != 3)
                         {
-                            if (planeController.Data == SceneComponentManager.Instance.Planes[j])
-                            {
-                                continue;
-                            }
-                            for (int k = 0; k < SceneComponentManager.Instance.Planes[j].Points.Length; k++)
-                            {
-                                int kPlus;
-                                if (k < 3) kPlus = k + 1;
-                                else kPlus = 0;
-                                if ((SceneComponentManager.Instance.Planes[j].Points[k] == planeController.Data.Points[i] && SceneComponentManager.Instance.Planes[j].Points[kPlus] == planeController.Data.Points[iPlus]) ||
-                                    (SceneComponentManager.Instance.Planes[j].Points[k] == planeController.Data.Points[iPlus] && SceneComponentManager.Instance.Planes[j].Points[kPlus] == planeController.Data.Points[i]))
-                                {
-                                    secondWallCenter = SceneComponentManager.Instance.Planes[j].Center;
-                                    extensionSecondPortalNormal = SceneComponentManager.Instance.Planes[j].Normal;
-                                    getSecondWall = true;
-                                    break;
-                                }
-                            }
+                            tryCreatingPortal = false;
+                            return;
                         }
-                    }
-
-                    if (!getSecondWall)
-                    {
-                        Debug.LogError("[PortalSceneManager][CreatPortalBall] No match second Wall!");
-                        tryCreatingPortal = false;
-                        return;
-                    }
-
-                    secondWallCenter = new Vector3(secondWallCenter.x, destination.y, secondWallCenter.z);
-                    Vector3 extensionVector = CommonFormula.UnitVector(secondWallCenter, toSide);
-                    extensionSecondPortalCenter = toSide + Vector3.Distance(toSide, destination) * extensionVector;
-
-                    Vector3 firstPortalBoundary = destination + radiusLength * CommonFormula.UnitVector(toSide, destination);
-                    Vector3 secondPortalBoundary = extensionSecondPortalCenter + radiusLength * CommonFormula.UnitVector(toSide, secondWallCenter);
-
-                    cornerPortalNormal = CommonFormula.UnitVector(CommonFormula.PointFromPointToLine(firstPortalBoundary, secondPortalBoundary, toSide), toSide);
-                    cornerPortalCenter = (firstPortalBoundary + secondPortalBoundary) / 2;
-
-                    Vector3 mn = Vector3.Cross(toSide - spawnPoint, Vector3.up).normalized;
-                    Vector3 fn = firstPortalBoundary -CommonFormula.PointFromPointToLine(new Vector3(spawnPoint.x, firstPortalBoundary.y, spawnPoint.z),
-                        new Vector3(toSide.x, firstPortalBoundary.y, toSide.z), firstPortalBoundary);
-
-                    if (Vector3.Angle(mn, fn) == 0)
-                    {
-                        cutLeft[0] = radiusLength;
-                        cutRight[0] = Vector3.Distance(toSide, firstPortalBoundary) - radiusLength;
-
-                        cutLeft[1] = -1 * (radiusLength - Vector3.Distance(toSide, secondPortalBoundary));
-                        cutRight[1] = radiusLength;
                     }
                     else
                     {
-                        cutRight[0] = radiusLength;
-                        cutLeft[0] = Vector3.Distance(toSide, firstPortalBoundary) - radiusLength;
+                        Vector3 secondWallCenter = Vector3.zero;
+                        bool getSecondWall = false;
+                        for (int j = 0; j < SceneComponentManager.Instance.Planes.Count; j++)
+                        {
+                            if (SceneComponentManager.Instance.Planes[j].Type == "wall")
+                            {
+                                if (planeController.Data == SceneComponentManager.Instance.Planes[j])
+                                {
+                                    continue;
+                                }
+                                for (int k = 0; k < SceneComponentManager.Instance.Planes[j].Points.Length; k++)
+                                {
+                                    int kPlus;
+                                    if (k < 3) kPlus = k + 1;
+                                    else kPlus = 0;
+                                    if ((SceneComponentManager.Instance.Planes[j].Points[k] == planeController.Data.Points[i] && SceneComponentManager.Instance.Planes[j].Points[kPlus] == planeController.Data.Points[iPlus]) ||
+                                        (SceneComponentManager.Instance.Planes[j].Points[k] == planeController.Data.Points[iPlus] && SceneComponentManager.Instance.Planes[j].Points[kPlus] == planeController.Data.Points[i]))
+                                    {
+                                        secondWallCenter = SceneComponentManager.Instance.Planes[j].Center;
+                                        extensionSecondPortalNormal = SceneComponentManager.Instance.Planes[j].Normal;
+                                        getSecondWall = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
 
-                        cutRight[1] = -1 * (radiusLength - Vector3.Distance(toSide, secondPortalBoundary));
-                        cutLeft[1] = radiusLength;
+                        if (!getSecondWall)
+                        {
+                            Debug.LogError("[PortalSceneManager][CreatPortalBall] No match second Wall!");
+                            tryCreatingPortal = false;
+                            return;
+                        }
+
+                        secondWallCenter = new Vector3(secondWallCenter.x, destination.y, secondWallCenter.z);
+                        Vector3 extensionVector = CommonFormula.UnitVector(secondWallCenter, toSide);
+                        extensionSecondPortalCenter = toSide + Vector3.Distance(toSide, destination) * extensionVector;
+
+                        Vector3 firstPortalBoundary = destination + radiusLength * CommonFormula.UnitVector(toSide, destination);
+                        Vector3 secondPortalBoundary = extensionSecondPortalCenter + radiusLength * CommonFormula.UnitVector(toSide, secondWallCenter);
+
+                        cornerPortalNormal = CommonFormula.UnitVector(CommonFormula.PointFromPointToLine(firstPortalBoundary, secondPortalBoundary, toSide), toSide);
+                        cornerPortalCenter = (firstPortalBoundary + secondPortalBoundary) / 2;
+
+                        Vector3 mn = Vector3.Cross(toSide - spawnPoint, Vector3.up).normalized;
+                        Vector3 fn = firstPortalBoundary - CommonFormula.PointFromPointToLine(new Vector3(spawnPoint.x, firstPortalBoundary.y, spawnPoint.z),
+                            new Vector3(toSide.x, firstPortalBoundary.y, toSide.z), firstPortalBoundary);
+
+                        if (Vector3.Angle(mn, fn) == 0)
+                        {
+                            cutLeft[0] = radiusLength;
+                            cutRight[0] = Vector3.Distance(toSide, firstPortalBoundary) - radiusLength;
+
+                            cutLeft[1] = -1 * (radiusLength - Vector3.Distance(toSide, secondPortalBoundary));
+                            cutRight[1] = radiusLength;
+                        }
+                        else
+                        {
+                            cutRight[0] = radiusLength;
+                            cutLeft[0] = Vector3.Distance(toSide, firstPortalBoundary) - radiusLength;
+
+                            cutRight[1] = -1 * (radiusLength - Vector3.Distance(toSide, secondPortalBoundary));
+                            cutLeft[1] = radiusLength;
+                        }
+
+                        hitCorner = true;
+
+                        break;
                     }
-
-                    hitCorner = true;
-
-                    break;
                 }
             }
         }

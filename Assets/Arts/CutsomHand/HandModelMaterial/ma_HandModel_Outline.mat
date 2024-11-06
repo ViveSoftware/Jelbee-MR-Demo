@@ -13,7 +13,7 @@ Material:
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 2000
   stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
@@ -96,8 +96,8 @@ Material:
     - _Gradient_level: 0.65
     - _NoiseTiling: 21.31
     - _Noise_Scale: 26.15
-    - _Opacity: 0.1
-    - _OutlineThickness: 0.0015
+    - _Opacity: 0.05
+    - _OutlineThickness: 0.001
     - _OutlineWidth: 0
     - _RimFalloff: 5.5
     - _RimPower: 2
@@ -116,7 +116,7 @@ Material:
     - _handOpacity: 0.4
     - _index_glowamt: 1
     - _intersectionEdge: 0.0018
-    - _line_opacity: 0.801
+    - _line_opacity: 0.125
     - _middle_glowamt: 1
     - _outlineWidth: 0
     - _pinky_glowamt: 1
@@ -141,3 +141,4 @@ Material:
     - _Vector0: {r: 10, g: 10, b: 0, a: 0}
     - _fingerTipColor: {r: 0.03529412, g: 0.48627448, b: 0.85490197, a: 1}
     - _intersectionColor: {r: 0.03529412, g: 0.48627448, b: 0.85490197, a: 1}
+  m_BuildTextureStacks: []
