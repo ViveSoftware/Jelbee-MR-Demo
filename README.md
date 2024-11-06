@@ -40,16 +40,11 @@ Jelbee MR Demo is an MR experience example for VIVE XR Elite. It demonstrates MR
 +	**PortalSceneManager.cs** : The flow of the MR Portal levels and the drawing method of the portal. 
 +	**PortalBallBehaviour.cs** : If you want to add a new portal, you need to inherit this script, such as UniversePortalBall.cs.
 +	**Hand Occlusion** : Virtual hand model already support occlusion and virtual lighting *(play on planet of [**Level 3 MR Portal-Universe**](#how-to-play-with-xr-elite))*. If you want to realize occlusion sample, you can follow material on the hand mode prefab `Arts / CutsomHand`.
-> #### Hand Occlusion - Hand Shadow
-> <img src="https://dl.vive.com/open-source/jelbeemr/jelbee_shadow.gif" width="720"/>
-> 
-> In this version, you can turn on shadow setting to feel immersive virtual interaction.
-> 
-> #### Hand Occlusion - Hand Virtual Lighting
-> 
-> <img src="https://dl.vive.com/open-source/jelbeemr/jelbee_light.gif" width="720"/>
-> 
-> In this version, you can use lighting effect overlap on the real hand to feel immersive virtual interaction.
+     1. **Hand Shadow** ([preview](https://dl.vive.com/open-source/jelbeemr/jelbee_shadow.gif))     
+         In this version, you can turn on shadow setting to feel immersive virtual interaction.
+    
+     2. **Hand Virtual Lighting** ([preview](https://dl.vive.com/open-source/jelbeemr/jelbee_light.gif))    
+         In this version, you can use lighting effect overlap on the real hand to feel immersive virtual interaction.
 
 
 ## Third Party Assets
